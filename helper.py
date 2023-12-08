@@ -7,17 +7,21 @@ def get_tree_to_end(maincomponent, *args):
     name_list = []
     parent_list = []
 
-    res = maincomponent.filterd_tree(*args, use_global=True)
-
-    print(res.children)
-    print(maincomponent.children_components)
-    print(res.as_dict())
+    res = maincomponent.filtered_tree(*args, use_global=True)
 
     def resolve(data):
-        for item in data.children:
-            name_list.append(item.name)
-            parent_list.append(data.name)
+        for item in data.get("children",[]):
+            name_list.append(item.get("name"))
+            parent_list.append(data.get("name"))
             resolve(item)
+
+
+    if type(res) is list:
+        res = {
+            "name": "root",
+            "children": res
+        }
+
     resolve(res)
 
     return name_list, parent_list

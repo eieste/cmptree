@@ -1,5 +1,5 @@
 import enum
-from node import RecursionNodeMixin, Node
+from node import Node
 
 class ElectricSignal(enum.Enum):
     name = "electric"
@@ -17,7 +17,7 @@ class ElectricSignal(enum.Enum):
     OTHER = "OTHER"
 
 
-class Component(RecursionNodeMixin):
+class Component:
     all_components = []
 
     def __init__(self, name, todo=False):
@@ -47,7 +47,6 @@ class Component(RecursionNodeMixin):
         self.sub_components[sub_component.get_name()] = sub_component
 
     def register_children(self, subcomponent, category_name="generic"):
-
         if subcomponent.get_name() not in self.children_components:
             self.children_components[subcomponent.get_name()] = {}
 
@@ -55,6 +54,41 @@ class Component(RecursionNodeMixin):
             self.children_components[subcomponent.get_name()][category_name] = set({})
         self.children_components[subcomponent.get_name()][category_name].add(subcomponent.component)
         return self
+
+    def goto_parent(self, component_type, category_name):
+        parent_cmp = self.parent_components.get(component_type, {}).get(category_name, None)
+        if parent_cmp is not None:
+            return parent_cmp.goto_parent(component_type, category_name)
+        return self
+
+
+
+    def filtered_tree(self, component_type, category_name="generic", use_global=False, add_parent=False, **kwargs):
+
+        if use_global: 
+            result_list = []
+
+            for cmp in self.__class__.all_components:
+                parent_cmp = cmp.goto_parent(component_type, category_name)
+                item = parent_cmp.filtered_tree(component_type, category_name=category_name, use_global=False, add_parent=add_parent)
+                if len(item.get("children")) > 0:
+
+                    if len(list(filter(lambda x: x.get("name") == item.get("name"), result_list))) <= 0:
+                        result_list.append(item)
+            return result_list
+        else:
+            components = self.children_components.get(component_type, {}).get(category_name, set({}))
+
+            current_element = {
+                "name": self.name,
+                "children": []
+            }
+            for child in components:
+                current_element["children"].append(
+                    child.filtered_tree(component_type, category_name, use_global=use_global)
+                )
+            return current_element
+
 
 class BaseSubComponent:
 

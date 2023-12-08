@@ -42,24 +42,3 @@ class Node:
             return self
         else:
             return self.parent.get_root()
-
-
-class RecursionNodeMixin:
-
-    def filterd_tree(self, component_type, category_name="generic", use_global=False, add_parent=False, parent_node=None):
-        components = self.children_components.get(component_type, {}).get(category_name, set({}))
-
-        if parent_node is None:
-            parent_node = Node(self)
-            if use_global:
-                use_global = False
-                components = self.all_components
-
-        for child in components:
-            if add_parent:
-                print("PARENTSEARCH")
-            else:
-                if not parent_node.find(child):
-                    child.filterd_tree(component_type, category_name, use_global=use_global, parent_node=parent_node)
-        return parent_node
-
