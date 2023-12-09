@@ -1,5 +1,7 @@
 import enum
-from node import Node
+import pandas as pd
+import uuid
+
 
 class ElectricSignal(enum.Enum):
     name = "electric"
@@ -26,6 +28,7 @@ class Component:
         self.sub_components = {}
         self.parent_components = {}
         self.children_components = {}
+        self.uuid = uuid.uuid4()
         self.__class__.all_components.append(self)
 
     def __str__(self):
@@ -61,10 +64,7 @@ class Component:
             return parent_cmp.goto_parent(component_type, category_name)
         return self
 
-
-
     def filtered_tree(self, component_type, category_name="generic", use_global=False, add_parent=False, **kwargs):
-
         if use_global: 
             result_list = []
 
@@ -72,16 +72,20 @@ class Component:
                 parent_cmp = cmp.goto_parent(component_type, category_name)
                 item = parent_cmp.filtered_tree(component_type, category_name=category_name, use_global=False, add_parent=add_parent)
                 if len(item.get("children")) > 0:
-
                     if len(list(filter(lambda x: x.get("name") == item.get("name"), result_list))) <= 0:
                         result_list.append(item)
             return result_list
         else:
             components = self.children_components.get(component_type, {}).get(category_name, set({}))
+            if category_name == "generic":
+                components = []
+                for key, catlist in self.children_components.get(component_type, {}).items():
+                    components = components + list(catlist)
 
             current_element = {
                 "name": self.name,
-                "children": []
+                "children": [],
+                "component": self
             }
             for child in components:
                 current_element["children"].append(
@@ -89,6 +93,56 @@ class Component:
                 )
             return current_element
 
+    @classmethod
+    def filter(cls, component_type, category_name):
+        result_list = []
+        for cmp in cls:
+            if len(cmp.children_components.get(component_type, {}).get(category_name, set({}))) > 0:
+                result_list.append(cmp)
+        return result_list
+
+    def get_values(self, component_type, category_name, children_also):
+        cols = ["name"]
+
+        results = [
+            
+        ]
+        subcomponent = self.get(component_type)
+
+        cols, subvalues = subcomponent.get_values()
+
+        results.append(subvalues) 
+        
+        if children_also:
+            components = self.children_components.get(component_type, {}).get(category_name, set({}))
+            for cmp in components:
+                cmpcol, cmpvalue = cmp.get_values(component_type, category_name, children_also=children_also)
+                results = results + cmpvalue
+                       
+        return list(cols), results
+
+    def print(self, component_type, category_name, children_also=False):
+        cols, result = self.get_values(component_type, category_name, children_also=children_also)
+        print(result)
+        df = pd.DataFrame(result, columns=cols)
+        df.style.hide(axis="index")
+        return df        
+    
+    def is_connected(self, target_component, component_type, category_name, parent_search=True):
+        parent_component = self
+        if parent_search:
+            parent_component = self.goto_parent(component_type, category_name)
+
+        for child_cmp in parent_component.children_components.get(component_type, {}).get(category_name, set({})):
+            if child_cmp is target_component:
+                return True
+            if child_cmp.is_connected(target_component, component_type, category_name, parent_search=False):
+                return True
+
+        return False
+
+
+        
 
 class BaseSubComponent:
 
@@ -144,11 +198,21 @@ class BaseSubComponent:
 
     def filterd_tree(self, component_type, category_name, use_global=False, parent_node=None):
         x = parent_node.find(self.component.parent_components.get(component_type, {}).get(category_name))
-        print(x)
+
         if self.get_name() == component_type:
             new_node = Node(self.component)
             parent_node.add_child(new_node)
             self.component.filterd_tree(component_type, category_name, use_global=use_global, parent_node=new_node)
+
+    def get_values(self):
+        cols, values = set({"Name"}), []
+
+        values.append(self.component.name)
+        
+        for key, unit in self.units.items():
+            cols.add(key)
+            values.append(str(getattr(self, key))+" "+unit)
+        return cols, values
 
 
 class ThermalComponent(BaseSubComponent):

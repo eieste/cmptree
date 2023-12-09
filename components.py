@@ -104,7 +104,7 @@ ElectricComponent(raspberry_pi_fan, nominal_voltage=5.0, nominal_current=0.2).se
 DimensionComponent(raspberry_pi_fan, weight=20, length=30, width=30, height=7).set_parent(control_level)
 
 teensy = Component(name="Teensy", todo=True)
-ElectricComponent(teensy, required_voltage=5.0, required_current=1.0, maximal_current=1.0).set_parent(step_down_5v_2, ES.POWER_LVL_5)
+ElectricComponent(teensy, required_voltage=5.0, required_current=1.0, maximal_current=1.0).set_parent(step_down_5v_2, ES.POWER_LVL_5).set_parent(raspberry_pi, ES.SERIAL)
 DimensionComponent(teensy, weight=10, length=60, width=18, height=2).set_parent(control_level)
 
 motor_front_left = Component(name="Motor Front Left", todo=True)
@@ -116,11 +116,11 @@ ElectricComponent(motor_front_right, **default_electric_drive_motor).set_parent(
 DimensionComponent(motor_front_right).set_parent(supply_level)
 
 motor_back_left = Component(name="Motor Back Left", todo=True)
-ElectricComponent(motor_back_left, **default_electric_drive_motor).set_parent(step_down_7v_3, ES.POWER_LVL_7).set_parent(teensy, ES.PWMCTL).set_parent(teensy, ES.PWMFEED)
+ElectricComponent(motor_back_left, **default_electric_drive_motor).set_parent(step_down_7v_4, ES.POWER_LVL_7).set_parent(teensy, ES.PWMCTL).set_parent(teensy, ES.PWMFEED)
 DimensionComponent(motor_back_left).set_parent(supply_level)
 
 motor_back_right = Component(name="Motor Back Right", todo=True)
-ElectricComponent(motor_back_right, **default_electric_drive_motor).set_parent(step_down_7v_3, ES.POWER_LVL_7).set_parent(teensy, ES.PWMCTL).set_parent(teensy, ES.PWMFEED)
+ElectricComponent(motor_back_right, **default_electric_drive_motor).set_parent(step_down_7v_4, ES.POWER_LVL_7).set_parent(teensy, ES.PWMCTL).set_parent(teensy, ES.PWMFEED)
 DimensionComponent(motor_back_right).set_parent(supply_level)
 
 lidar = Component(name="LiDAR", todo=True)
