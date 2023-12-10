@@ -1,8 +1,11 @@
+#  Copyright (c) 2023. Stefan Eiermann
+#  Licenced under AGPL see /LICENSE
+
 
 class Circuit:
 
     all_circuits = []
-    
+
     def __init__(self, signal_name, uuid, *args):
         self.signal_name = signal_name
         self.uuid = uuid
@@ -14,7 +17,7 @@ class Circuit:
                 return True
 
         return False
-    
+
     @classmethod
     def search(cls, component, signal_name):
         for circuit in cls.all_circuits:
