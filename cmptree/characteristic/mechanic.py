@@ -4,8 +4,8 @@
 from cmptree.characteristic.base import BaseCharacteristic
 
 
-class MechanicComponent(BaseCharacteristic):
-    name = "mechanic"
+class MechanicCharacteristic(BaseCharacteristic):
+    characteristic_name = "mechanic"
 
     def __init__(self, *args, torque=None, **kwargs):
         super().__init__(*args, **kwargs)

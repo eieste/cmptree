@@ -2,6 +2,16 @@
 #  Licenced under AGPL see /LICENSE
 import enum
 
+from cmptree.characteristic.electric.base import (
+    BaseCharacteristic,
+    ElectricCharacteristic,
+)
+from cmptree.characteristic.electric.supply import ElectricSupplyCharacteristic
+from cmptree.characteristic.electric.convert import ElectricConvertCharacteristic
+from cmptree.characteristic.electric.distribute import (
+    ElectricDistributionCharacteristic,
+)
+
 
 class ElectricSignal(enum.Enum):
     name = "electric"
@@ -17,3 +27,13 @@ class ElectricSignal(enum.Enum):
     USB = "USB"
     SERIAL = "SERIAL"
     OTHER = "OTHER"
+
+
+__all__ = [
+    "BaseCharacteristic",
+    "ElectricCharacteristic",
+    "ElectricSupplyCharacteristic",
+    "ElectricConvertCharacteristic",
+    "ElectricDistributionCharacteristic",
+    "ElectricSignal",
+]

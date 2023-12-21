@@ -3,8 +3,8 @@
 from cmptree.characteristic.base import BaseCharacteristic
 
 
-class ThermalComponent(BaseCharacteristic):
-    name = "thermal"
+class ThermalCharacteristic(BaseCharacteristic):
+    characteristic_name = "thermal"
 
     def __init__(self, *args, btu=None, **kwargs):
         super().__init__(*args, **kwargs)

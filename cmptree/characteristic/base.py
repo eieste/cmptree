@@ -4,22 +4,24 @@ from cmptree.part import Part
 
 
 class BaseCharacteristic:
-    def __init__(self, component, **kwargs):
-        self.component = component
-        if self.get_name() in component.characteristics:
+    characteristic_name = None
+
+    def __init__(self, part, **kwargs):
+        self.part = part
+        if self.get_name() in part.characteristics:
             raise ValueError(f"{self.get_name()} already attached")
-        component.attach_characteristic(self)
+        part.attach_characteristic(self)
 
     def __str__(self):
-        return f'<{self.__class__.__name__} part="{self.component.name}">'
+        return f'<{self.__class__.__name__} part="{self.part.name}">'
 
     def __repr__(self):
-        return f'<{self.__class__.__name__} part="{self.component.name}">'
+        return f'<{self.__class__.__name__} part="{self.part.name}">'
 
     def get_name(self):
-        if not hasattr(self, "name"):
+        if not hasattr(self, "characteristic_name"):
             raise ValueError("Name is missing")
-        return self.name
+        return self.characteristic_name
 
     def add_child(self, component):
         self.children_links.add(component)
@@ -29,16 +31,16 @@ class BaseCharacteristic:
         if not isinstance(parent_part, Part):
             raise ValueError("Given value isnt a Component")
 
-        if parent_part is self.component:
+        if parent_part is self.part:
             raise ValueError("parent_part cant be my part")
 
-        if category_name in self.component.parent_parts.get(self.get_name(), {}):
+        if category_name in self.part.parent_parts.get(self.get_name(), {}):
             raise ValueError(
                 f"My parent Component has already defined a parent part for {self.get_name()}"
             )
 
         # Add Parent Component
-        self.component.parent_parts[self.get_name()] = {category_name: parent_part}
+        self.part.parent_parts[self.get_name()] = {category_name: parent_part}
 
         # Add Children Component
         parent_part.register_characteristic(self, category_name)
@@ -57,13 +59,13 @@ class BaseCharacteristic:
         self, component_type, category_name, use_global=False, parent_node=None
     ):
         x = parent_node.find(
-            self.component.parent_parts.get(component_type, {}).get(category_name)
+            self.part.parent_parts.get(component_type, {}).get(category_name)
         )
 
         if self.get_name() == component_type:
-            new_node = Node(self.component)
+            new_node = Node(self.part)
             parent_node.add_child(new_node)
-            self.component.filterd_tree(
+            self.part.filterd_tree(
                 component_type,
                 category_name,
                 use_global=use_global,
@@ -73,7 +75,7 @@ class BaseCharacteristic:
     def get_values(self):
         cols, values = set({"Name"}), []
 
-        values.append(self.component.name)
+        values.append(self.part.name)
 
         for key, unit in self.units.items():
             cols.add(key)

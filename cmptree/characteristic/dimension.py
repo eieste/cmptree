@@ -4,8 +4,8 @@
 from cmptree.characteristic.base import BaseCharacteristic
 
 
-class DimensionComponent(BaseCharacteristic):
-    name = "dimension"
+class DimensionCharacteristic(BaseCharacteristic):
+    characteristic_name = "dimension"
 
     def __init__(
         self, *args, weight=None, height=None, width=None, length=None, **kwargs

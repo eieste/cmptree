@@ -6,6 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "cmptree"
 dynamic = ["version"]
 dependencies = [
+    "plotly",
+    "pandas"
 ]
 
 [tool.setuptools.dynamic]
@@ -16,7 +18,8 @@ dev = [
     "pre-commit",
     "sphinx-autobuild",
     "coverage",
-    "pytest"
+    "pytest",
+    "pytest-mock"
 ]
 
 docs = [
